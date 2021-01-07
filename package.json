@@ -1,0 +1,45 @@
+{
+  "name": "arquero-arrow",
+  "version": "0.0.1",
+  "description": "Arrow serialization support for Arquero.",
+  "keywords": [
+    "arrow",
+    "arquero",
+    "data",
+    "format"
+  ],
+  "license": "BSD-3-Clause",
+  "author": "Jeffrey Heer (http://idl.cs.washington.edu)",
+  "main": "dist/arquero-arrow.js",
+  "module": "src/index.js",
+  "unpkg": "dist/arquero-arrow.min.js",
+  "jsdelivr": "dist/arquero-arrow.min.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uwdata/arquero-arrow.git"
+  },
+  "scripts": {
+    "prebuild": "rimraf dist && mkdir dist",
+    "build": "rollup -c",
+    "lint": "yarn eslint src test perf --ext .js",
+    "preperf": "yarn build",
+    "perf": "TZ=America/Los_Angeles tape 'perf/**/*-perf.js'",
+    "pretest": "yarn build",
+    "test": "TZ=America/Los_Angeles tape 'test/**/*-test.js'",
+    "prepublishOnly": "yarn test && yarn lint"
+  },
+  "dependencies": {
+    "apache-arrow": "2.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
+    "arquero": "^2.1.0",
+    "eslint": "^7.17.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.36.1",
+    "rollup-plugin-bundle-size": "1.0.3",
+    "rollup-plugin-terser": "^7.0.2",
+    "tape": "^5.1.1"
+  }
+}
