@@ -5,8 +5,6 @@ const {
 const { table } = require('arquero');
 const { dataFrom } = require('../dist/arquero-arrow');
 
-const N = 1e6;
-
 function rint(min, max) {
   let delta = min;
   if (max === undefined) {
@@ -102,41 +100,29 @@ function encode(t, type, values, nulls = true) {
   t.end();
 }
 
-tape('boolean encoding', t => {
-  encode(t, new Bool(), bools(N, 0), false);
-});
+function run(N, nulls, msg) {
+  const nullable = nulls !== 0;
 
-tape('integer encoding', t => {
-  encode(t, new Int32(), ints(N, -10000, 10000, 0), false);
-});
+  tape(`boolean: ${msg}`, t => {
+    encode(t, new Bool(), bools(N, nulls), nullable);
+  });
 
-tape('float encoding', t => {
-  encode(t, new Float64(), floats(N, -10000, 10000, 0), false);
-});
+  tape(`integer: ${msg}`, t => {
+    encode(t, new Int32(), ints(N, -10000, 10000, nulls), nullable);
+  });
 
-tape('dictionary encoding', t => {
-  encode(t,
-    new Dictionary(new Utf8(), new Uint32(), 0),
-    sample(N, strings(100), 0),
-    false
-  );
-});
+  tape(`float: ${msg}`, t => {
+    encode(t, new Float64(), floats(N, -10000, 10000, nulls), nullable);
+  });
 
-tape('boolean encoding, 5% nulls', t => {
-  encode(t, new Bool(), bools(N, 0.05));
-});
+  tape(`dictionary: ${msg}`, t => {
+    encode(t,
+      new Dictionary(new Utf8(), new Uint32(), 0),
+      sample(N, strings(100), nulls),
+      nullable
+    );
+  });
+}
 
-tape('integer encoding, 5% nulls', t => {
-  encode(t, new Int32(), ints(N, -10000, 10000, 0.05));
-});
-
-tape('float encoding, 5% nulls', t => {
-  encode(t, new Float64(), floats(N, -10000, 10000, 0.05));
-});
-
-tape('dictionary encoding, 5% nulls', t => {
-  encode(t,
-    new Dictionary(new Utf8(), new Uint32(), 0),
-    sample(N, strings(100), 0.05)
-  );
-});
+run(1e6, 0, '1M values');
+run(1e6, 0.05, '1M values, 5% nulls');
