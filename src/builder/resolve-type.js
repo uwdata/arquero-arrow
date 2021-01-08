@@ -1,4 +1,5 @@
 import {
+  Binary,
   Bool,
   DataType,
   DateDay,
@@ -11,7 +12,13 @@ import {
   Int32,
   Int64,
   Int8,
+  IntervalDayTime,
+  IntervalYearMonth,
   Null,
+  TimeMicrosecond,
+  TimeMillisecond,
+  TimeNanosecond,
+  TimeSecond,
   Type,
   Uint16,
   Uint32,
@@ -19,13 +26,17 @@ import {
   Uint8,
   Utf8
 } from 'apache-arrow';
+import error from '../util/error';
+import toString from '../util/to-string';
 
 export default function(type) {
-  if (type instanceof DataType) {
+  if (type instanceof DataType || type == null) {
     return type;
   }
 
   switch (type) {
+    case Type.Binary:
+      return new Binary();
     case Type.Bool:
       return new Bool();
     case Type.DateDay:
@@ -51,8 +62,22 @@ export default function(type) {
       return new Int32();
     case Type.Int64:
       return new Int64();
+    case Type.IntervalDayTime:
+      return new IntervalDayTime();
+    case Type.Interval:
+    case Type.IntervalYearMonth:
+      return new IntervalYearMonth();
     case Type.Null:
       return new Null();
+    case Type.TimeMicrosecond:
+      return new TimeMicrosecond();
+    case Type.TimeMillisecond:
+    case Type.Time:
+      return new TimeMillisecond();
+    case Type.TimeNanosecond:
+      return new TimeNanosecond();
+    case Type.TimeSecond:
+      return new TimeSecond();
     case Type.Uint8:
       return new Uint8();
     case Type.Uint16:
@@ -62,6 +87,9 @@ export default function(type) {
     case Type.Uint64:
       return new Uint64();
     default:
-      return null;
+      error(
+        `Unsupported type code: ${toString(type)}. ` +
+        'Use a data type constructor instead?'
+      );
   }
 }

@@ -1,14 +1,34 @@
 # arquero-arrow <a href="https://github.com/uwdata/arquero"><img align="right" src="https://github.com/uwdata/arquero/blob/master/docs/assets/logo.svg?raw=true" height="38"></img></a>
 
-Arrow serialization support for [Arquero](https://github.com/uwdata/arquero). The `toArrow(data)` method encodes either an Arquero table or an array of objects into the [Apache Arrow](https://arrow.apache.org/) format.
+Arrow serialization support for [Arquero](https://github.com/uwdata/arquero). The `toArrow(data)` method encodes either an Arquero table or an array of objects into the [Apache Arrow](https://arrow.apache.org/) format. This package provides a convenient interface to the [apache-arrow](https://arrow.apache.org/docs/js/) JavaScript library, while also providing more performant encoders for standard integer, float, date, boolean, and string dictionary types.
 
-## Example
+## API Documentation
 
-Encode Arrow data from an input Arquero table:
+<a id="toArrow" href="#toArrow">#</a>
+<em>aq</em>.<b>toArrow</b>(<i>input</i>, <i>types</i>) · [Source](https://github.com/uwdata/arquero-arrow/blob/master/src/encode/to-arrow.js)
+
+Create an [Apache Arrow](https://arrow.apache.org/docs/js/) table for an *input* dataset. The input data can be either an [Arquero table](https://uwdata.github.io/arquero/api/#table) or an array of standard JavaScript objects. This method will throw an error if type inference fails or if the generated columns have differing lengths.
+
+* *input*: An input dataset to convert to Arrow format. If array-valued, the data should consist of an array of objects where each entry represents a row and named properties represent columns. Otherwise, the input data should be an [Arquero table](https://uwdata.github.io/arquero/api/#table).
+* *types*: An optional object indicating the [Arrow data type](https://arrow.apache.org/docs/js/enums/type.html) to use for named columns. If specified, the input should be an object with column names for keys and Arrow data types for values. If a column's data type is not explicitly provided, type inference will be performed.
+
+  Type values can either be instantiated Arrow [DataType](https://arrow.apache.org/docs/js/classes/datatype.html) instances (for example, `new Float64()`,`new DateMilliseconds()`, *etc.*) or type enum codes (`Type.Float64`, `Type.Date`, `Type.Dictionary`). For convenience, arquero-arrow re-exports the apache-arrow `Type` enum object (see examples below). High-level types map to specific data type instances as follows:
+
+  * `Type.Date` → `new DateMilliseconds()`
+  * `Type.Dictionary` → `new Dictionary(new Utf8(), new Uint32())`
+  * `Type.Float` → `new Float64()`
+  * `Type.Int` → `new Int32()`
+  * `Type.Interval` → `new IntervalYearMonth()`
+  * `Type.Time` → `new TimeMillisecond()`
+
+  Types that require additional parameters (including `List`, `Struct`, and `Timestamp`) can not be specified using type codes. Instead, use data type constructors from apache-arrow, such as `new List(new Int32())`.
+
+*Examples*
 
 ```js
-import { table } from 'arquero';
-import { toArrow, Type } from 'arquero-arrow';
+// Encode Arrow data from an input Arquero table
+const { table } = require('arquero');
+const { toArrow, Type } = require('arquero-arrow');
 
 // create Arquero table
 const dt = table({
@@ -27,14 +47,13 @@ const at2 = toArrow(dt, { x: Type.Uint16, y: Type.Float32 });
 const bytes = at1.serialize();
 ```
 
-Register a `toArrow()` method for all Arquero tables:
-
 ```js
-import { internal, table } from 'arquero';
-import { toArrow } from 'arquero-arrow';
+// Register a `toArrow()` method for all Arquero tables
+const { internal: { ColumnTable }, table } = require('arquero');
+const { toArrow } = require('arquero-arrow');
 
 // add new method to Arquero tables
-internal.ColumnTable.prototype.toArrow = function(types) {
+ColumnTable.prototype.toArrow = function(types) {
   return toArrow(this, types);
 };
 
@@ -45,10 +64,9 @@ const at = table({
 }).toArrow();
 ```
 
-Encode Arrow data from an input object array:
-
 ```js
-import { toArrow } from 'arquero-arrow';
+// Encode Arrow data from an input object array
+const { toArrow } = require('arquero-arrow');
 
 // encode object array as an Arrow table (infer data types)
 const at = toArrow([
