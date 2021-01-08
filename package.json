@@ -1,6 +1,6 @@
 {
   "name": "arquero-arrow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Arrow serialization support for Arquero.",
   "keywords": [
     "arrow",
