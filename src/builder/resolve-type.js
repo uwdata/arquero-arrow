@@ -86,6 +86,8 @@ export default function(type) {
       return new Uint32();
     case Type.Uint64:
       return new Uint64();
+    case Type.Utf8:
+      return new Utf8();
     default:
       error(
         `Unsupported type code: ${toString(type)}. ` +

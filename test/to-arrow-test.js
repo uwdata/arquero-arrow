@@ -2,7 +2,7 @@ const tape = require('tape');
 const { readFileSync } = require('fs');
 const { Int8Vector, Table } = require('apache-arrow');
 const { fromArrow, fromCSV, fromJSON, table } = require('arquero');
-const { toArrow } = require('..');
+const { toArrow, Type } = require('..');
 
 function date(year, month=0, date=1, hours=0, minutes=0, seconds=0, ms=0) {
   return new Date(year, month, date, hours, minutes, seconds, ms);
@@ -152,6 +152,77 @@ tape('toArrow result produces serialized arrow data', t => {
     [json, json],
     'arrow and json round trips match'
   );
+
+  t.end();
+});
+
+tape('toArrow respects columns option', t => {
+  const dt = table({
+    w: ['a', 'b', 'a'],
+    x: [1, 2, 3],
+    y: [1.6181, 2.7182, 3.1415],
+    z: [true, true, false]
+  });
+
+  const at = toArrow(dt, { columns: ['w', 'y'] });
+
+  t.deepEqual(
+    at.schema.fields.map(f => f.name),
+    ['w', 'y'],
+    'column subset'
+  );
+
+  t.end();
+});
+
+tape('toArrow respects limit and offset options', t => {
+  const dt = table({
+    w: ['a', 'b', 'a'],
+    x: [1, 2, 3],
+    y: [1.6181, 2.7182, 3.1415],
+    z: [true, true, false]
+  });
+
+  t.equal(
+    JSON.stringify([...toArrow(dt, { limit: 2 })]),
+    '[{"w":"a","x":1,"y":1.6181,"z":true},{"w":"b","x":2,"y":2.7182,"z":true}]',
+    'limit'
+  );
+  t.equal(
+    JSON.stringify([...toArrow(dt, { offset: 1 })]),
+    '[{"w":"b","x":2,"y":2.7182,"z":true},{"w":"a","x":3,"y":3.1415,"z":false}]',
+    'offset'
+  );
+  t.equal(
+    JSON.stringify([...toArrow(dt, { offset: 1, limit: 1 })]),
+    '[{"w":"b","x":2,"y":2.7182,"z":true}]',
+    'limit and offset'
+  );
+
+  t.end();
+});
+
+tape('toArrow respects limit and types option', t => {
+  const dt = table({
+    w: ['a', 'b', 'a'],
+    x: [1, 2, 3],
+    y: [1.6181, 2.7182, 3.1415],
+    z: [true, true, false]
+  });
+
+  const at = toArrow(dt, {
+    types: { w: Type.Utf8, x: Type.Int32, y: Type.Float32 }
+  });
+
+  const types = ['w', 'x', 'y', 'z'].map(name => at.getColumn(name).type);
+
+  t.deepEqual(
+    types.map(t => t.typeId),
+    [Type.Utf8, Type.Int, Type.Float, Type.Bool],
+    'type ids match'
+  );
+  t.equal(types[1].bitWidth, 32, 'int32');
+  t.equal(types[2].precision, 1, 'float32');
 
   t.end();
 });

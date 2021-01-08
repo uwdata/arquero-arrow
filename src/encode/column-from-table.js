@@ -3,14 +3,12 @@ import {
   Int16, Int32, Int64, Int8,
   Uint16, Uint32, Uint64, Uint8, Vector
 } from 'apache-arrow';
-import profiler from './profiler';
-import builder from '../builder';
+import { dataFromArray, dataFromScan } from './data-from';
+import { profile } from './profiler';
 import resolveType from '../builder/resolve-type';
-import { arrowData, ceil64Bytes } from '../builder/util';
 import isTypedArray from '../util/is-typed-array';
-import scan from '../util/scan-column';
 
-export default function(table, name, type, nullable = true) {
+export default function(table, name, nrows, scan, type, nullable = true) {
   type = resolveType(type);
   const column = table.column(name);
   const reified = !(table.isFiltered() || table.isOrdered());
@@ -34,18 +32,15 @@ export default function(table, name, type, nullable = true) {
 
   // perform type inference if needed
   if (!type) {
-    const p = profile(table, column);
+    const p = profile(scan, column);
     nullable = p.nulls > 0;
     type = p.type();
   }
 
-  return Column.new(name, dataFromTable(table, column, type, nullable));
-}
-
-function profile(table, column) {
-  const p = profiler();
-  scan(table, column, p.add);
-  return p;
+  return Column.new(
+    name,
+    dataFromScan(nrows, scan, column, type, nullable)
+  );
 }
 
 function isArrowColumn(value) {
@@ -72,23 +67,4 @@ function typeFromArray(data) {
 
 function typeCompatible(a, b) {
   return !a || !b ? true : a.compareTo(b);
-}
-
-function dataFromArray(array, type) {
-  const length = array.length;
-  const size = ceil64Bytes(length, array.BYTES_PER_ELEMENT);
-
-  let data = array;
-  if (length !== size) {
-    data = new array.constructor(size);
-    data.set(array);
-  }
-
-  return arrowData({ type, length, buffers: [null, data] });
-}
-
-export function dataFromTable(table, column, type, nullable = true) {
-  const b = builder(type, table.numRows(), nullable);
-  scan(table, column, b.set);
-  return arrowData(b.data());
 }

@@ -5,7 +5,7 @@ const {
   Utf8, Table, Vector, Field, FixedSizeList, List, Struct
 } = require('apache-arrow');
 const { table } = require('arquero');
-const { dataFrom } = require('../dist/arquero-arrow');
+const { dataFromTable } = require('..');
 
 function integerTest(t, type) {
   const values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -39,7 +39,7 @@ function dateTest(t, type) {
 
 function valueTest(t, type, values, msg) {
   const dt = table({ values });
-  const u = dataFrom(dt, dt.column('values'), type);
+  const u = dataFromTable(dt, dt.column('values'), type);
   const v = Vector.from({ type, values, highWaterMark: Infinity });
   const tu = Table.new([u], ['values']);
   const tv = Table.new([v], ['values']);

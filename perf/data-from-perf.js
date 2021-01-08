@@ -3,7 +3,7 @@ const {
   Bool, Table, Vector, Uint32, Int32, Float64, Dictionary, Utf8
 } = require('apache-arrow');
 const { table } = require('arquero');
-const { dataFrom } = require('../dist/arquero-arrow');
+const { dataFromTable } = require('..');
 
 function rint(min, max) {
   let delta = min;
@@ -77,7 +77,7 @@ function encode(t, type, values, nulls = true) {
   const dt = table({ values });
 
   const u0 = Date.now();
-  const u = dataFrom(dt, dt.column('values'), type, nulls);
+  const u = dataFromTable(dt, dt.column('values'), type, nulls);
   const a = Table.new([u], ['values']).serialize();
   const ut = Date.now() - u0;
 

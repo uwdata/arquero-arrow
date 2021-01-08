@@ -12,7 +12,13 @@ import isArrayType from '../util/is-array-type';
 import isDate from '../util/is-date';
 import isExactUTCDate from '../util/is-exact-utc-date';
 
-export default function profiler() {
+export function profile(scan, column) {
+  const p = profiler();
+  scan(column, p.add);
+  return p;
+}
+
+export function profiler() {
   const p = {
     count: 0,
     nulls: 0,
