@@ -25,8 +25,9 @@ Create an [Apache Arrow](https://arrow.apache.org/docs/js/) table for an *input*
 
 *Examples*
 
+Encode Arrow data from an input Arquero table:
+
 ```js
-// Encode Arrow data from an input Arquero table
 const { table } = require('arquero');
 const { toArrow, Type } = require('arquero-arrow');
 
@@ -47,8 +48,9 @@ const at2 = toArrow(dt, { x: Type.Uint16, y: Type.Float32 });
 const bytes = at1.serialize();
 ```
 
+Register a `toArrow()` method for all Arquero tables:
+
 ```js
-// Register a `toArrow()` method for all Arquero tables
 const { internal: { ColumnTable }, table } = require('arquero');
 const { toArrow } = require('arquero-arrow');
 
@@ -64,8 +66,9 @@ const at = table({
 }).toArrow();
 ```
 
+Encode Arrow data from an input object array:
+
 ```js
-// Encode Arrow data from an input object array
 const { toArrow } = require('arquero-arrow');
 
 // encode object array as an Arrow table (infer data types)
