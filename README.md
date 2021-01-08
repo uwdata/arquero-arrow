@@ -19,7 +19,7 @@ Create an [Apache Arrow](https://arrow.apache.org/docs/js/) table for an *input*
     Type values can either be instantiated Arrow [DataType](https://arrow.apache.org/docs/js/classes/datatype.html) instances (for example, `new Float64()`,`new DateMilliseconds()`, *etc.*) or type enum codes (`Type.Float64`, `Type.Date`, `Type.Dictionary`). For convenience, arquero-arrow re-exports the apache-arrow `Type` enum object (see examples below). High-level types map to specific data type instances as follows:
 
     * `Type.Date` → `new DateMilliseconds()`
-    * `Type.Dictionary` → `new Dictionary(new Utf8(), new Uint32())`
+    * `Type.Dictionary` → `new Dictionary(new Utf8(), new Int32())`
     * `Type.Float` → `new Float64()`
     * `Type.Int` → `new Int32()`
     * `Type.Interval` → `new IntervalYearMonth()`

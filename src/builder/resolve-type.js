@@ -45,7 +45,7 @@ export default function(type) {
     case Type.Date:
       return new DateMillisecond();
     case Type.Dictionary:
-      return new Dictionary(new Utf8(), new Uint32());
+      return new Dictionary(new Utf8(), new Int32());
     case Type.Float16:
       return new Float16();
     case Type.Float32:
