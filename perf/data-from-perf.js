@@ -4,6 +4,7 @@ const {
 } = require('apache-arrow');
 const { table } = require('arquero');
 const { dataFromTable } = require('..');
+const { performance } = require('perf_hooks');
 
 function rint(min, max) {
   let delta = min;
@@ -76,25 +77,28 @@ function bools(n, nullf) {
 function encode(t, type, values, nulls = true) {
   const dt = table({ values });
 
-  const u0 = Date.now();
+  const u0 = performance.now();
   const u = dataFromTable(dt, dt.column('values'), type, nulls);
   const a = Table.new([u], ['values']).serialize();
-  const ut = Date.now() - u0;
+  const ut = performance.now() - u0;
 
-  const v0 = Date.now();
+  const v0 = performance.now();
   const v = Vector.from({ type, values, highWaterMark: 1e12 });
   const b = Table.new([v], ['values']).serialize();
-  const vt = Date.now() - v0;
+  const vt = performance.now() - v0;
 
-  const j0 = Date.now();
+  const j0 = performance.now();
   const js = JSON.stringify(values);
-  const jt = Date.now() - j0;
+  const jt = performance.now() - j0;
   const j = (new TextEncoder().encode(js));
 
   console.table([ // eslint-disable-line
-    { method: 'json',  time: jt, bytes: j.length },
-    { method: 'this',  time: ut, bytes: a.length },
-    { method: 'arrow', time: vt, bytes: b.length }
+    { method: 'json',  time: 
+Math.round(jt), bytes: j.length },
+    { method: 'this',  time: 
+Math.round(ut), bytes: a.length },
+    { method: 'arrow', time: 
+Math.round(vt), bytes: b.length }
   ]);
 
   t.end();
