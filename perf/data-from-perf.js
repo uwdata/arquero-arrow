@@ -93,12 +93,9 @@ function encode(t, type, values, nulls = true) {
   const j = (new TextEncoder().encode(js));
 
   console.table([ // eslint-disable-line
-    { method: 'json',  time: 
-Math.round(jt), bytes: j.length },
-    { method: 'this',  time: 
-Math.round(ut), bytes: a.length },
-    { method: 'arrow', time: 
-Math.round(vt), bytes: b.length }
+    { method: 'json',  time: Math.round(jt), bytes: j.length },
+    { method: 'this',  time: Math.round(ut), bytes: a.length },
+    { method: 'arrow', time: Math.round(vt), bytes: b.length }
   ]);
 
   t.end();
