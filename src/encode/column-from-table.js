@@ -14,8 +14,9 @@ export default function(table, name, nrows, scan, type, nullable = true) {
   const reified = !(table.isFiltered() || table.isOrdered());
 
   // use existing arrow data if types match
-  if (reified && isArrowColumn(column) && typeCompatible(column.type, type)) {
-    return Column.new(name, column.chunks || column);
+  const vec = arrowVector(column);
+  if (vec && reified && typeCompatible(vec.type, type)) {
+    return Column.new(name, vec.chunks || vec);
   }
 
   // if backing data is a typed array, leverage that
@@ -43,8 +44,10 @@ export default function(table, name, nrows, scan, type, nullable = true) {
   );
 }
 
-function isArrowColumn(value) {
-  return value instanceof Column || value instanceof Vector;
+function arrowVector(value) {
+  return value instanceof Vector ? value
+    : value.vector instanceof Vector ? value.vector
+    : null;
 }
 
 const types = {
