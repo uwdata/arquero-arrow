@@ -2,6 +2,8 @@
 
 Arrow serialization support for [Arquero](https://github.com/uwdata/arquero). The `toArrow(data)` method encodes either an Arquero table or an array of objects into the [Apache Arrow](https://arrow.apache.org/) format. This package provides a convenient interface to the [apache-arrow](https://arrow.apache.org/docs/js/) JavaScript library, while also providing more performant encoders for standard integer, float, date, boolean, and string dictionary types.
 
+For more examples and context, see the [Arquero and Apache Arrow notebook](https://observablehq.com/@uwdata/arquero-and-apache-arrow).
+
 ## API Documentation
 
 <a id="toArrow" href="#toArrow">#</a>
@@ -57,16 +59,14 @@ const at2 = toArrow(dt, {
 const bytes = at1.serialize();
 ```
 
-Register a `toArrow()` method for all Arquero tables:
+Register a `toArrow()` method for all Arquero tables (requires Arquero v2.3 or higher):
 
 ```js
-const { internal: { ColumnTable }, table } = require('arquero');
-const { toArrow } = require('arquero-arrow');
+const { addPackage, table } = require('arquero');
 
-// add new method to Arquero tables
-ColumnTable.prototype.toArrow = function(types) {
-  return toArrow(this, types);
-};
+// install the package bundle exported by arquero-arrow,
+// adding a toArrow method to all Arquero tables
+addPackage(require('arquero-arrow'));
 
 // create Arquero table, encode as an Arrow table (infer data types)
 const at = table({
