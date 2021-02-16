@@ -1,5 +1,9 @@
 # arquero-arrow <a href="https://github.com/uwdata/arquero"><img align="right" src="https://github.com/uwdata/arquero/blob/master/docs/assets/logo.svg?raw=true" height="38"></img></a>
 
+**NOTE: This package has been consolidated into the [uwdata/arquero](https://github.com/uwdata/arquero) package, where future development and issues will be handled. This repository has been archived and is now read-only.**
+
+<hr/>
+
 Arrow serialization support for [Arquero](https://github.com/uwdata/arquero). The `toArrow(data)` method encodes either an Arquero table or an array of objects into the [Apache Arrow](https://arrow.apache.org/) format. This package provides a convenient interface to the [apache-arrow](https://arrow.apache.org/docs/js/) JavaScript library, while also providing more performant encoders for standard integer, float, date, boolean, and string dictionary types.
 
 For more examples and context, see the [Arquero and Apache Arrow notebook](https://observablehq.com/@uwdata/arquero-and-apache-arrow).
